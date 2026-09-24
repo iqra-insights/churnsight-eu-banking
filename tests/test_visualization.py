@@ -19,6 +19,12 @@ from european_bank_churn.visualization import (
 )
 
 
+def _title_text(figure: go.Figure) -> str:
+    """Return the semantic chart title without the dashboard's bold HTML wrapper."""
+    title = figure.layout.title.text or ""
+    return title.replace("<b>", "").replace("</b>", "")
+
+
 def test_churn_bar_contains_segment_labels():
     summary = pd.DataFrame(
         {
@@ -31,7 +37,7 @@ def test_churn_bar_contains_segment_labels():
     )
     figure = churn_bar(summary, "Geography", "Test churn")
     assert isinstance(figure, go.Figure)
-    assert figure.layout.title.text == "Test churn"
+    assert _title_text(figure) == "Test churn"
     assert list(figure.data[0].x) == ["France", "Germany"]
 
 
@@ -57,14 +63,14 @@ def test_model_diagnostic_figures_are_labeled():
             }
         )
     )
-    assert matrix_figure.layout.title.text == "Confusion matrix"
-    assert importance_figure.layout.title.text == "Random Forest feature importance"
+    assert _title_text(matrix_figure) == "Confusion matrix"
+    assert _title_text(importance_figure) == "Random Forest feature importance"
 
 
 def test_salary_balance_scatter_contains_both_churn_classes(customer_frame):
     prepared_data, _ = prepare_data(customer_frame)
     figure = salary_balance_scatter(prepared_data)
-    assert figure.layout.title.text == "Salary and balance profile by churn status"
+    assert _title_text(figure) == "Salary and balance profile by churn status"
     assert {trace.name.split(",")[0] for trace in figure.data} == {
         "Retained",
         "Churned",
@@ -100,6 +106,6 @@ def test_advanced_model_diagnostic_figures_are_labeled():
             }
         )
     )
-    assert calibration.layout.title.text == "Probability calibration on the holdout set"
-    assert permutation.layout.title.text == "Holdout permutation importance (PR-AUC decrease)"
-    assert coefficients.layout.title.text == "Logistic Regression direction of association"
+    assert _title_text(calibration) == "Probability calibration on the holdout set"
+    assert _title_text(permutation) == "Holdout permutation importance (PR-AUC decrease)"
+    assert _title_text(coefficients) == "Logistic Regression direction of association"
