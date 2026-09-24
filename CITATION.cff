@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this educational project, please cite it as below."
+title: "European Bank Customer Segmentation and Churn Analytics"
+type: software
+authors:
+  - name: "Iqra Insights"
+repository-code: "https://github.com/iqra-insights/churnsight-eu-banking"
+url: "https://churnsight-eu-banking.streamlit.app"
+version: 0.5.0
+date-released: 2026-09-13

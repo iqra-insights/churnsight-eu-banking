@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.py[cod]
+.idea/
+.agents/
+.DS_Store
+.env
+.streamlit/secrets.toml
+*.xlsx
+*.xls
+*.csv
+*.joblib
+*.pkl
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Keep the professional data directory layout without publishing customer data.
+data/raw/*
+data/interim/*
+data/processed/*
+!data/processed/european_bank_dashboard.csv.gz
+models/*
