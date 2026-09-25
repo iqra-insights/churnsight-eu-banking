@@ -5,6 +5,36 @@
 Keep the Streamlit page easy to deploy while making analytical logic reusable, testable, and
 independent from the user interface.
 
+## 🏗️ Architecture & Data Flow
+
+```mermaid
+flowchart LR
+    A[("📄 data/raw/<br>European_Bank.xlsx")] --> B["scripts/<br>build_dashboard_dataset.py"]
+    B --> C[("📦 data/processed/<br>european_bank_dashboard.csv.gz")]
+    C --> D["european_bank_churn/data.py<br>validate · clean · segment"]
+    D --> E["european_bank_churn/analytics.py<br>KPIs & segment summaries"]
+    D --> F["european_bank_churn/modeling.py<br>train/test split"]
+    F --> G["Logistic Regression"]
+    F --> H["Random Forest"]
+    E --> I["european_bank_churn/dashboard.py"]
+    G --> I
+    H --> I
+    I --> J["european_bank_churn/business.py<br>Retention ROI scenario"]
+    I --> K["european_bank_churn/visualization.py<br>Plotly charts"]
+    I --> L(["🖥️ app.py →<br>Live Streamlit Dashboard"])
+
+    style A fill:#1E1E1E,color:#fff,stroke:#FF4B4B
+    style C fill:#1E1E1E,color:#fff,stroke:#FF4B4B
+    style L fill:#FF4B4B,color:#fff,stroke:#fff
+    style G fill:#2B2B2B,color:#fff
+    style H fill:#2B2B2B,color:#fff
+```
+
+The raw workbook never ships publicly — only a maintainer with the authorized source file runs
+`build_dashboard_dataset.py`, and only its de-identified, compressed output is committed to the
+repository. `app.py` stays a thin entrypoint: every calculation the dashboard shows is produced by
+a tested function in `european_bank_churn/`, not written inline on the page.
+
 ## Component map
 
 | Component | Responsibility | Must not contain |
