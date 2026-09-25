@@ -248,7 +248,15 @@ flowchart LR
     H --> I
     I --> J[Calibration, explainability and fairness]
     I --> K[Retention ROI scenario]
+
+    style A fill:#1E1E1E,color:#fff,stroke:#FF4B4B
+    style C fill:#1E1E1E,color:#fff,stroke:#FF4B4B
+    style I fill:#FF4B4B,color:#fff,stroke:#fff
+    style G fill:#2B2B2B,color:#fff
+    style H fill:#2B2B2B,color:#fff
 ```
+
+See [docs/architecture.md](docs/architecture.md) for the full component map and deployment contract.
 
 The required project is primarily segmentation and descriptive analytics. ML is a secondary
 component used to rank churn risk, not a replacement for business KPI analysis.
