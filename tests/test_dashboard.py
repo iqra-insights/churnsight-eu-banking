@@ -18,7 +18,7 @@ def test_dashboard_opens_with_bundled_data_and_no_upload_control():
     markdown_text = "\n".join(
         element.value for element in app.markdown if hasattr(element, "value")
     )
-    assert "Customer Segmentation & Churn Pattern Analytics" in markdown_text
+    assert "Customer Segmentation &amp; Churn Pattern Analytics" in markdown_text
 
     assert [(metric.label, metric.value) for metric in app.metric[:3]] == [
         ("👥 Customers", "10,000"),
