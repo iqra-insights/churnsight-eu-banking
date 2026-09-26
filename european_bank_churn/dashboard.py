@@ -77,12 +77,10 @@ def _render_overview(
     _, high_value_kpis = high_value_summary(filtered, high_value_threshold)
     engagement_ratio = engagement_risk_ratio(filtered)
 
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("👥 Customers", f"{kpis['customers']:,}")
     c2.metric("📉 Churners", f"{kpis['churners']:,}")
     c3.metric("📊 Overall churn rate", f"{kpis['churn_rate']:.1%}")
-
-    c4, c5 = st.columns(2)
     c4.metric("💰 High-value churn rate", f"{high_value_kpis['churn_rate']:.1%}")
     c5.metric(
         "⚠️ Inactive / active risk",
@@ -636,6 +634,12 @@ def run_dashboard() -> None:
     st.markdown(
         """
         <style>
+        .block-container {
+            max-width: 100% !important;
+            padding-top: 1.5rem !important;
+            padding-left: 2.5rem !important;
+            padding-right: 2.5rem !important;
+        }
         [data-testid="stMetric"] {
             background-color: #171B23;
             border: 1px solid #2A2E38;
@@ -649,7 +653,7 @@ def run_dashboard() -> None:
         [data-testid="stMetricValue"] {
             color: #FF6B6B;
             font-weight: 600;
-            font-size: clamp(1rem, 1.3vw, 1.6rem) !important;
+            font-size: clamp(0.85rem, 1.1vw, 1.4rem) !important;
             letter-spacing: -0.3px;
             overflow: visible !important;
             text-overflow: clip !important;
@@ -662,12 +666,15 @@ def run_dashboard() -> None:
         }
         [data-testid="stMetricLabel"] {
             color: #9CA3AF;
-            font-size: 0.82rem;
-        }
-        [data-testid="stMetricLabel"] > div,
-        [data-testid="stMetricLabel"] p {
-            white-space: normal !important;
+            font-size: 0.78rem;
             overflow: visible !important;
+            white-space: normal !important;
+            text-overflow: unset !important;
+            line-height: 1.25 !important;
+        }
+        [data-testid="stMetricLabel"] * {
+            overflow: visible !important;
+            white-space: normal !important;
             text-overflow: unset !important;
             line-height: 1.25 !important;
         }
