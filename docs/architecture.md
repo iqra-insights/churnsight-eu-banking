@@ -9,25 +9,21 @@ independent from the user interface.
 
 ```mermaid
 flowchart LR
-    A[("📄 data/raw/<br>European_Bank.xlsx")] --> B["scripts/<br>build_dashboard_dataset.py"]
-    B --> C[("📦 data/processed/<br>european_bank_dashboard.csv.gz")]
-    C --> D["european_bank_churn/data.py<br>validate · clean · segment"]
-    D --> E["european_bank_churn/analytics.py<br>KPIs & segment summaries"]
-    D --> F["european_bank_churn/modeling.py<br>train/test split"]
-    F --> G["Logistic Regression"]
-    F --> H["Random Forest"]
-    E --> I["european_bank_churn/dashboard.py"]
-    G --> I
-    H --> I
-    I --> J["european_bank_churn/business.py<br>Retention ROI scenario"]
-    I --> K["european_bank_churn/visualization.py<br>Plotly charts"]
-    I --> L(["🖥️ app.py →<br>Live Streamlit Dashboard"])
+    A[("🔒 data/raw/<br>European_Bank.xlsx")] --> B["⚙️ build_dashboard_dataset.py"]
+    B --> C[("📦 data/processed/<br>dashboard.csv.gz")]
+    C --> D["🧹 data.py<br>validate · clean · segment"]
+    D --> E["📊 analytics.py<br>KPIs & summaries"]
+    D --> F["🤖 modeling.py<br>Logistic Regression · Random Forest"]
+    E --> G["🖥️ dashboard.py"]
+    F --> G
+    G --> H["💰 business.py<br>Retention ROI"]
+    G --> I["📈 visualization.py<br>Plotly charts"]
+    G --> J(["🚀 app.py → Live Dashboard"])
 
-    style A fill:#1E1E1E,color:#fff,stroke:#FF4B4B
-    style C fill:#1E1E1E,color:#fff,stroke:#FF4B4B
-    style L fill:#FF4B4B,color:#fff,stroke:#fff
-    style G fill:#2B2B2B,color:#fff
-    style H fill:#2B2B2B,color:#fff
+    style A fill:#1E2761,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
+    style C fill:#1E2761,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
+    style J fill:#E63946,color:#fff,stroke:#fff,stroke-width:2px
+    style G fill:#2A3578,color:#fff,stroke:#CADCFC,stroke-width:2px
 ```
 
 The raw workbook never ships publicly — only a maintainer with the authorized source file runs
