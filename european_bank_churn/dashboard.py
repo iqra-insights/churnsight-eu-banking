@@ -1,10 +1,10 @@
 """Streamlit interface for the customer segmentation and churn project."""
-
+ 
 from __future__ import annotations
-
+ 
 import pandas as pd
 import streamlit as st
-
+ 
 from .analytics import (
     engagement_risk_ratio,
     geography_age_matrix,
@@ -34,32 +34,32 @@ from .visualization import (
     permutation_importance_figure,
     salary_balance_scatter,
 )
-
+ 
 st.set_page_config(
     page_title="European Bank Churn Analytics",
     page_icon="🏦",
     layout="wide",
 )
-
-
+ 
+ 
 @st.cache_data(show_spinner=False)
 def read_standardized_data() -> pd.DataFrame:
     """Read the bundled dashboard dataset once per application process."""
     return load_dashboard_data()
-
-
+ 
+ 
 @st.cache_resource(show_spinner="Training Logistic Regression and Random Forest...")
 def fit_models(data: pd.DataFrame) -> dict:
     """Cache trained models for an unchanged prepared dataset."""
     return train_model_comparison(data)
-
-
+ 
+ 
 @st.cache_data(show_spinner="Running five-fold stratified cross-validation...")
 def validate_models(data: pd.DataFrame) -> pd.DataFrame:
     """Cache expensive cross-validation results for an unchanged dataset."""
     return cross_validate_models(data)
-
-
+ 
+ 
 def _require_model_result(data: pd.DataFrame, button_key: str) -> dict | None:
     """Provide one consistent model-training gate across advanced dashboard tabs."""
     if "model_result" not in st.session_state:
@@ -67,8 +67,8 @@ def _require_model_result(data: pd.DataFrame, button_key: str) -> dict | None:
         if st.button("Train models and unlock advanced analysis", key=button_key, type="primary"):
             st.session_state["model_result"] = fit_models(data)
     return st.session_state.get("model_result")
-
-
+ 
+ 
 def _render_overview(
     filtered: pd.DataFrame,
     high_value_threshold: float,
@@ -76,7 +76,7 @@ def _render_overview(
     kpis = overall_kpis(filtered)
     _, high_value_kpis = high_value_summary(filtered, high_value_threshold)
     engagement_ratio = engagement_risk_ratio(filtered)
-
+ 
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("👥 Customers", f"{kpis['customers']:,}")
     c2.metric("📉 Churners", f"{kpis['churners']:,}")
@@ -86,7 +86,7 @@ def _render_overview(
         "⚠️ Inactive / active risk",
         f"{engagement_ratio:.2f}x" if pd.notna(engagement_ratio) else "N/A",
     )
-
+ 
     geography_summary = segment_summary(filtered, "Geography")
     geography_summary["GeographicRiskIndex"] = (
         geography_summary["ChurnRate"] / kpis["churn_rate"]
@@ -115,8 +115,8 @@ def _render_overview(
         "Risk describes association in this dataset. It does not prove that geography, "
         "age, or another field caused churn."
     )
-
-
+ 
+ 
 def _render_segments(filtered: pd.DataFrame) -> None:
     selected_label = st.selectbox(
         "Choose a segmentation dimension",
@@ -154,8 +154,8 @@ def _render_segments(filtered: pd.DataFrame) -> None:
         file_name="segment_summary.csv",
         mime="text/csv",
     )
-
-
+ 
+ 
 def _render_demographics(filtered: pd.DataFrame) -> None:
     left, right = st.columns(2)
     with left:
@@ -167,15 +167,15 @@ def _render_demographics(filtered: pd.DataFrame) -> None:
             churn_bar(tenure_summary, "TenureGroup", "Tenure-group churn"),
             width="stretch",
         )
-
+ 
     st.plotly_chart(
         geography_age_heatmap(geography_age_matrix(filtered)),
         width="stretch",
     )
     st.subheader("Average profile: churned vs retained")
     st.dataframe(profile_comparison(filtered), width="stretch", hide_index=True)
-
-
+ 
+ 
 def _render_high_value(
     data: pd.DataFrame,
     filtered: pd.DataFrame,
@@ -189,7 +189,7 @@ def _render_high_value(
     )
     threshold = float(data["Balance"].quantile(percentile / 100))
     premium, premium_kpis = high_value_summary(filtered, threshold)
-
+ 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("💶 Balance threshold", f"{threshold:,.2f}")
     c2.metric("💎 High-value customers", f"{premium_kpis['customers']:,}")
@@ -199,11 +199,11 @@ def _render_high_value(
         "Balance at risk is an exposure proxy, not revenue loss. Revenue estimation "
         "requires fees, margin, cost-to-serve, and customer lifetime data."
     )
-
+ 
     if premium.empty:
         st.info("No customers meet this threshold under the current filters.")
         return
-
+ 
     premium_geo = segment_summary(premium, "Geography")
     st.plotly_chart(
         churn_bar(premium_geo, "Geography", "High-value churn by geography"),
@@ -237,8 +237,8 @@ def _render_high_value(
         file_name="high_value_customers.csv",
         mime="text/csv",
     )
-
-
+ 
+ 
 def _render_model_comparison(data: pd.DataFrame) -> None:
     st.subheader("Supervised-learning model comparison")
     st.write(
@@ -252,7 +252,7 @@ def _render_model_comparison(data: pd.DataFrame) -> None:
     model_result = _require_model_result(data, "train_models_comparison")
     if model_result is None:
         return
-
+ 
     comparison_rows = []
     for model_name, probability_key in [
         ("Logistic Regression", "logistic_probabilities"),
@@ -292,7 +292,7 @@ def _render_model_comparison(data: pd.DataFrame) -> None:
         width="stretch",
         hide_index=True,
     )
-
+ 
     st.subheader("Random Forest decision threshold")
     decision_threshold = st.slider(
         "Probability threshold for classifying a customer as high risk",
@@ -328,8 +328,8 @@ def _render_model_comparison(data: pd.DataFrame) -> None:
         "Feature importance shows model reliance, not causation. Use the validation and "
         "explainability tabs for stronger diagnostics before interpreting the model."
     )
-
-
+ 
+ 
 def _render_model_validation(data: pd.DataFrame) -> None:
     st.subheader("Model robustness and probability calibration")
     st.write(
@@ -339,7 +339,7 @@ def _render_model_validation(data: pd.DataFrame) -> None:
     model_result = _require_model_result(data, "train_models_validation")
     if model_result is None:
         return
-
+ 
     y_test = model_result["y_test"]
     curves = {
         "Logistic Regression": calibration_table(
@@ -363,7 +363,7 @@ def _render_model_validation(data: pd.DataFrame) -> None:
         "with the reliability curve and ranking metrics."
     )
     st.plotly_chart(calibration_figure(curves), width="stretch")
-
+ 
     risk_bands = model_result["test_records"].copy()
     risk_bands["RiskBand"] = pd.cut(
         risk_bands["RandomForestProbability"],
@@ -392,7 +392,7 @@ def _render_model_validation(data: pd.DataFrame) -> None:
         width="stretch",
         hide_index=True,
     )
-
+ 
     if st.button("Run five-fold cross-validation", key="run_cross_validation"):
         st.session_state["cross_validation"] = validate_models(data)
     if "cross_validation" in st.session_state:
@@ -410,7 +410,7 @@ def _render_model_validation(data: pd.DataFrame) -> None:
             "Mean measures average fold performance; standard deviation shows variability. "
             "Temporal validation is not possible because the supplied Year field is constant."
         )
-
+ 
     with st.expander("Model and dataset version", expanded=False):
         metadata = model_result["metadata"]
         st.json(
@@ -422,8 +422,8 @@ def _render_model_validation(data: pd.DataFrame) -> None:
                 "holdout_rows": metadata["test_rows"],
             }
         )
-
-
+ 
+ 
 def _render_explainability_and_fairness(data: pd.DataFrame) -> None:
     st.subheader("Model explainability")
     st.write(
@@ -433,7 +433,7 @@ def _render_explainability_and_fairness(data: pd.DataFrame) -> None:
     model_result = _require_model_result(data, "train_models_explainability")
     if model_result is None:
         return
-
+ 
     st.plotly_chart(
         permutation_importance_figure(model_result["permutation_importances"]),
         width="stretch",
@@ -445,7 +445,7 @@ def _render_explainability_and_fairness(data: pd.DataFrame) -> None:
     st.caption(
         "These are predictive associations, not proof that changing a feature will prevent churn."
     )
-
+ 
     st.subheader("Customer-level explanation")
     records = model_result["test_records"]
     customer_id = st.selectbox(
@@ -477,7 +477,7 @@ def _render_explainability_and_fairness(data: pd.DataFrame) -> None:
         "The signed contribution table explains the Logistic Regression probability. The Random "
         "Forest probability is shown separately because its behavior is nonlinear."
     )
-
+ 
     actions = []
     if int(customer["IsActiveMember"].iloc[0]) == 0:
         actions.append("Offer a reviewed re-engagement conversation; the account is inactive.")
@@ -490,7 +490,7 @@ def _render_explainability_and_fairness(data: pd.DataFrame) -> None:
     st.write("Illustrative reviewed actions:")
     for action in actions:
         st.markdown(f"- {action}")
-
+ 
     st.subheader("Subgroup performance audit")
     group_label = st.selectbox(
         "Audit model outcomes by",
@@ -533,8 +533,8 @@ def _render_explainability_and_fairness(data: pd.DataFrame) -> None:
         "Different subgroup metrics are a screening signal, not a legal fairness conclusion. "
         "Review sample sizes, confidence intervals, feature necessity, and applicable policy."
     )
-
-
+ 
+ 
 def _render_retention_roi(data: pd.DataFrame) -> None:
     st.subheader("Retention campaign ROI simulator")
     st.write(
@@ -543,7 +543,7 @@ def _render_retention_roi(data: pd.DataFrame) -> None:
     model_result = _require_model_result(data, "train_models_roi")
     if model_result is None:
         return
-
+ 
     records = model_result["test_records"]
     capacity = st.slider(
         "Maximum customers the campaign can contact",
@@ -596,7 +596,7 @@ def _render_retention_roi(data: pd.DataFrame) -> None:
     )
     roi = scenario["estimated_roi"]
     r7.metric("📊 Estimated ROI", f"{roi:.1%}" if pd.notna(roi) else "N/A")
-
+ 
     display_columns = [
         "CustomerId",
         "RandomForestProbability",
@@ -627,8 +627,8 @@ def _render_retention_roi(data: pd.DataFrame) -> None:
         "This is a scenario, not forecast revenue. It uses uncalibrated holdout probabilities "
         "and user assumptions because the dataset has no campaign cost, margin, or lifetime value."
     )
-
-
+ 
+ 
 def run_dashboard() -> None:
     """Render the complete Streamlit dashboard."""
     st.markdown(
@@ -636,7 +636,7 @@ def run_dashboard() -> None:
         <style>
         .block-container {
             max-width: 100% !important;
-            padding-top: 1.5rem !important;
+            padding-top: 3.5rem !important;
             padding-left: 2.5rem !important;
             padding-right: 2.5rem !important;
         }
@@ -734,7 +734,7 @@ def run_dashboard() -> None:
             border-radius: 2px;
         }
         </style>
-
+ 
         <div class="churnsight-header">
             <div class="churnsight-badge">🏦</div>
             <p class="churnsight-title">Customer Segmentation &amp; Churn Pattern Analytics</p>
@@ -747,21 +747,21 @@ def run_dashboard() -> None:
         "Interactive analysis of the standardized European banking project dataset. "
         "No file upload is required."
     )
-
+ 
     try:
         raw = read_standardized_data()
     except Exception as exc:
         st.error("The standardized dashboard dataset could not be loaded.")
         st.caption(f"Expected application asset: {DASHBOARD_DATA_PATH.name}. Details: {exc}")
         st.stop()
-
+ 
     findings = validate_dataset(raw)
     errors = [item for item in findings if item["level"] == "error"]
     if errors:
         for item in errors:
             st.error(item["message"])
         st.stop()
-
+ 
     data, default_thresholds = prepare_data(raw)
     with st.expander("Data validation", expanded=False):
         for item in findings:
@@ -770,7 +770,7 @@ def run_dashboard() -> None:
             else:
                 st.info(item["message"])
         st.write(f"Rows available for analysis: {len(data):,}")
-
+ 
     st.sidebar.header("Filters")
     geography_options = sorted(data["Geography"].dropna().unique())
     gender_options = sorted(data["Gender"].dropna().unique())
@@ -819,7 +819,7 @@ def run_dashboard() -> None:
         product_options,
         default=product_options,
     )
-
+ 
     filtered = data[
         data["Geography"].isin(geographies)
         & data["Gender"].isin(genders)
@@ -833,7 +833,7 @@ def run_dashboard() -> None:
     if filtered.empty:
         st.warning("The current filters return no customers.")
         st.stop()
-
+ 
     (
         overview,
         segments,
@@ -871,3 +871,4 @@ def run_dashboard() -> None:
         _render_explainability_and_fairness(data)
     with roi:
         _render_retention_roi(data)
+ 
