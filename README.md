@@ -232,69 +232,32 @@ python scripts/generate_eda_report.py "data/raw/European_Bank.xlsx"
 | Path has spaces or `(1)` in it (e.g. a re-downloaded ZIP) | Wrap the path in double quotes when running commands, e.g. `cd "C:\Users\You\Downloads\churnsight-eu-banking (1)"`. |
 | Dashboard opens but shows no charts | Confirm `data/processed/european_bank_dashboard.csv.gz` exists — it ships with the repository and should not be deleted or gitignored. |
 
-## Method summary
+## 🏗️ Architecture & Data Flow
 
 ```mermaid
-%%{init: {
-  "theme": "base",
-  "themeVariables": {
-    "background": "#0B0E14",
-    "primaryColor": "#171B23",
-    "primaryBorderColor": "#3A3F4B",
-    "primaryTextColor": "#F5F6F8",
-    "lineColor": "#8A93A3",
-    "clusterBkg": "#11151D",
-    "clusterBorder": "#2A2E38",
-    "fontFamily": "Segoe UI, Calibri, sans-serif",
-    "fontSize": "16px"
-  }
-}}%%
-flowchart TD
-    subgraph DATA["📦 Data preparation"]
-        A[Private source workbook] --> B[Validate and de-identify offline]
-        B --> C[Bundled standardized data]
-        C --> D[Type cleaning and segment features]
-    end
+flowchart LR
+    A[("🔒 data/raw/<br>European_Bank.xlsx")] --> B["⚙️ build_dashboard_dataset.py"]
+    B --> C[("📦 data/processed/<br>dashboard.csv.gz")]
+    C --> D["🧹 data.py<br>validate · clean · segment"]
+    D --> E["📊 analytics.py<br>KPIs & summaries"]
+    D --> F["🤖 modeling.py<br>Logistic Regression · Random Forest"]
+    E --> G["🖥️ dashboard.py"]
+    F --> G
+    G --> H["💰 business.py<br>Retention ROI"]
+    G --> I["📈 visualization.py<br>Plotly charts"]
+    G --> J(["🚀 app.py → Live Dashboard"])
 
-    subgraph MODEL["⚙️ Modeling"]
-        F[Stratified train and test split]
-        G[Logistic Regression]
-        H[Random Forest]
-        F --> G
-        F --> H
-    end
-
-    D --> E[KPIs and EDA]
-    D --> F
-
-    subgraph APP["🖥️ Dashboard and insights"]
-        I[Streamlit dashboard]
-        J[Calibration, explainability, fairness]
-        K[Retention ROI scenario]
-        I --> J
-        I --> K
-    end
-
-    E --> I
-    G --> I
-    H --> I
-
-    style A fill:#241417,color:#fff,stroke:#FF6B6B,stroke-width:1.5px
-    style C fill:#241417,color:#fff,stroke:#FF6B6B,stroke-width:1.5px
-    style G fill:#171B23,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
-    style H fill:#171B23,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
-    style I fill:#171B23,color:#fff,stroke:#F2B84B,stroke-width:2px
-    style E fill:#171B23,color:#fff,stroke:#3A3F4B
-    style F fill:#171B23,color:#fff,stroke:#3A3F4B
-    style J fill:#171B23,color:#fff,stroke:#3A3F4B
-    style K fill:#171B23,color:#fff,stroke:#3A3F4B
-    style B fill:#171B23,color:#fff,stroke:#3A3F4B
-    style D fill:#171B23,color:#fff,stroke:#3A3F4B
-
-    style DATA fill:#11151D,stroke:#2A2E38,color:#F5F6F8
-    style MODEL fill:#11151D,stroke:#2A2E38,color:#F5F6F8
-    style APP fill:#11151D,stroke:#2A2E38,color:#F5F6F8
+    style A fill:#1E2761,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
+    style C fill:#1E2761,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
+    style J fill:#E63946,color:#fff,stroke:#fff,stroke-width:2px
+    style G fill:#2A3578,color:#fff,stroke:#CADCFC,stroke-width:2px
 ```
+
+The raw workbook stays private — only `build_dashboard_dataset.py` ever touches it, and only its
+de-identified output ships publicly. From there, `data.py` cleans and segments the data,
+`analytics.py` and `modeling.py` compute KPIs and train the two classifiers, and `dashboard.py`
+assembles everything (charts via `visualization.py`, ROI scenario via `business.py`) into the live
+app served through `app.py`.
 
 See [docs/architecture.md](docs/architecture.md) for the full component map and deployment contract.
 
