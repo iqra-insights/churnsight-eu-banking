@@ -235,25 +235,65 @@ python scripts/generate_eda_report.py "data/raw/European_Bank.xlsx"
 ## Method summary
 
 ```mermaid
-flowchart LR
-    A[Private source workbook] --> B[Validate and de-identify offline]
-    B --> C[Bundled standardized data]
-    C --> D[Type cleaning and segment features]
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#0B0E14",
+    "primaryColor": "#171B23",
+    "primaryBorderColor": "#3A3F4B",
+    "primaryTextColor": "#F5F6F8",
+    "lineColor": "#8A93A3",
+    "clusterBkg": "#11151D",
+    "clusterBorder": "#2A2E38",
+    "fontFamily": "Segoe UI, Calibri, sans-serif",
+    "fontSize": "16px"
+  }
+}}%%
+flowchart TD
+    subgraph DATA["📦 Data preparation"]
+        A[Private source workbook] --> B[Validate and de-identify offline]
+        B --> C[Bundled standardized data]
+        C --> D[Type cleaning and segment features]
+    end
+
+    subgraph MODEL["⚙️ Modeling"]
+        F[Stratified train and test split]
+        G[Logistic Regression]
+        H[Random Forest]
+        F --> G
+        F --> H
+    end
+
     D --> E[KPIs and EDA]
-    D --> F[Stratified train/test split]
-    F --> G[Logistic Regression]
-    F --> H[Random Forest]
-    E --> I[Direct-load Streamlit dashboard]
+    D --> F
+
+    subgraph APP["🖥️ Dashboard and insights"]
+        I[Streamlit dashboard]
+        J[Calibration, explainability, fairness]
+        K[Retention ROI scenario]
+        I --> J
+        I --> K
+    end
+
+    E --> I
     G --> I
     H --> I
-    I --> J[Calibration, explainability and fairness]
-    I --> K[Retention ROI scenario]
 
-    style A fill:#1E1E1E,color:#fff,stroke:#FF4B4B
-    style C fill:#1E1E1E,color:#fff,stroke:#FF4B4B
-    style I fill:#FF4B4B,color:#fff,stroke:#fff
-    style G fill:#2B2B2B,color:#fff
-    style H fill:#2B2B2B,color:#fff
+    style A fill:#241417,color:#fff,stroke:#FF6B6B,stroke-width:1.5px
+    style C fill:#241417,color:#fff,stroke:#FF6B6B,stroke-width:1.5px
+    style G fill:#171B23,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
+    style H fill:#171B23,color:#fff,stroke:#4C9AFF,stroke-width:1.5px
+    style I fill:#171B23,color:#fff,stroke:#F2B84B,stroke-width:2px
+    style E fill:#171B23,color:#fff,stroke:#3A3F4B
+    style F fill:#171B23,color:#fff,stroke:#3A3F4B
+    style J fill:#171B23,color:#fff,stroke:#3A3F4B
+    style K fill:#171B23,color:#fff,stroke:#3A3F4B
+    style B fill:#171B23,color:#fff,stroke:#3A3F4B
+    style D fill:#171B23,color:#fff,stroke:#3A3F4B
+
+    style DATA fill:#11151D,stroke:#2A2E38,color:#F5F6F8
+    style MODEL fill:#11151D,stroke:#2A2E38,color:#F5F6F8
+    style APP fill:#11151D,stroke:#2A2E38,color:#F5F6F8
 ```
 
 See [docs/architecture.md](docs/architecture.md) for the full component map and deployment contract.
