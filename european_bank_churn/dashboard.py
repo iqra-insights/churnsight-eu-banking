@@ -646,10 +646,26 @@ def run_dashboard() -> None:
         }
         [data-testid="stMetricValue"] {
             color: #FF6B6B;
-            font-weight: 700;
+            font-weight: 600;
+            font-size: clamp(1.15rem, 1.6vw, 1.7rem) !important;
+            letter-spacing: -0.3px;
+        }
+        [data-testid="stMetricValue"] > div,
+        [data-testid="stMetricValue"] p {
+            overflow: visible !important;
+            text-overflow: unset !important;
+            white-space: nowrap !important;
         }
         [data-testid="stMetricLabel"] {
             color: #9CA3AF;
+            font-size: 0.82rem;
+        }
+        [data-testid="stMetricLabel"] > div,
+        [data-testid="stMetricLabel"] p {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            line-height: 1.25 !important;
         }
         div[data-baseweb="tag"] {
             background-color: #FF6B6B !important;
