@@ -77,10 +77,12 @@ def _render_overview(
     _, high_value_kpis = high_value_summary(filtered, high_value_threshold)
     engagement_ratio = engagement_risk_ratio(filtered)
 
-    c1, c2, c3, c4, c5 = st.columns(5)
+    c1, c2, c3 = st.columns(3)
     c1.metric("👥 Customers", f"{kpis['customers']:,}")
     c2.metric("📉 Churners", f"{kpis['churners']:,}")
     c3.metric("📊 Overall churn rate", f"{kpis['churn_rate']:.1%}")
+
+    c4, c5 = st.columns(2)
     c4.metric("💰 High-value churn rate", f"{high_value_kpis['churn_rate']:.1%}")
     c5.metric(
         "⚠️ Inactive / active risk",
@@ -647,13 +649,15 @@ def run_dashboard() -> None:
         [data-testid="stMetricValue"] {
             color: #FF6B6B;
             font-weight: 600;
-            font-size: clamp(1.15rem, 1.6vw, 1.7rem) !important;
+            font-size: clamp(1rem, 1.3vw, 1.6rem) !important;
             letter-spacing: -0.3px;
-        }
-        [data-testid="stMetricValue"] > div,
-        [data-testid="stMetricValue"] p {
             overflow: visible !important;
-            text-overflow: unset !important;
+            text-overflow: clip !important;
+            white-space: nowrap !important;
+        }
+        [data-testid="stMetricValue"] * {
+            overflow: visible !important;
+            text-overflow: clip !important;
             white-space: nowrap !important;
         }
         [data-testid="stMetricLabel"] {
